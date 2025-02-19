@@ -35,8 +35,8 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     x_imu2lidar = float(msg->pose.pose.position.x) + IMU2LIDAR_DISTANCE_X - IMU2LIDAR_DISTANCE * cosf(IMU2LIDAR_ANGLE + euler_z);
     y_imu2lidar = float(msg->pose.pose.position.y) + IMU2LIDAR_DISTANCE_Y - IMU2LIDAR_DISTANCE * sinf(IMU2LIDAR_ANGLE + euler_z); 
 
-    x_lidar2robot = x_imu2lidar - LIDAR2ROBOT * cosf(-PI / 2 + euler_z);
-    y_lidar2robot = y_imu2lidar - LIDAR2ROBOT - LIDAR2ROBOT * sinf(-PI / 2 + euler_z);
+    x_lidar2robot = x_imu2lidar - LIDAR2ROBOT * cosf(PI / 2 + euler_z);
+    y_lidar2robot = y_imu2lidar + LIDAR2ROBOT - LIDAR2ROBOT * sinf(PI / 2 + euler_z);
     
     euler_z = euler_z * (180.0 / M_PI);
     euler_x = eulerAngles[2] * (180.0 / M_PI);
