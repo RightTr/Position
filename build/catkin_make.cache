@@ -1,0 +1,2 @@
+position
+-DCATKIN_DEVEL_PREFIX=/home/nf/Position_jetson/devel -DCMAKE_INSTALL_PREFIX=/home/nf/Position_jetson/install -G Unix Makefiles
