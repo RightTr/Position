@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "pos_node");
     ros::NodeHandle nh;
 
-    ros::Subscriber odom_pub = nh.subscribe<nav_msgs::Odometry>("aft_mapped_to_init", 1, OdomCallback);
+    ros::Subscriber odom_sub = nh.subscribe<nav_msgs::Odometry>("aft_mapped_to_init", 1, OdomCallback);
 
     ros::spin();
     return 0;

@@ -270,7 +270,7 @@ void UART::UART_SET_PARITY(int in_parity)
 void UART::UART_SEND(const uint8_t* buffer_written, size_t length)
 {   
     ssize_t bytes_written = write(fd, buffer_written, length);
-    usleep(100000);
+    usleep(1000);
 
     if(bytes_written != -1)
     {
@@ -310,7 +310,7 @@ void UART::UART_RECEIVE()
             COUT_RED_START
             printf("Receive error!\n");
             COUT_COLOR_END
-            usleep(100000);
+            usleep(1000);
         } 
     }
 }
