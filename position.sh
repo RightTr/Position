@@ -2,10 +2,7 @@
 sleep 5
 source /opt/ros/noetic/setup.bash
 
-source /home/right/Desktop/Livox/devel/setup.bash
-
-gnome-terminal -- bash -c "sudo chmod 666 /dev/ttyUSB0; exec bash"
-sleep 3
+source /home/right/livox/devel/setup.bash
 
 gnome-terminal -- bash -c "roslaunch livox_ros_driver2 msg_MID360.launch; exec bash"
 sleep 3

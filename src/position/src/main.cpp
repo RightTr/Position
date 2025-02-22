@@ -24,6 +24,8 @@ int k = 0;
 float x_imu2lidar, y_imu2lidar;
 float x_lidar2robot, y_lidar2robot;
 
+
+
 void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {   
     Eigen::Quaterniond q(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
@@ -51,10 +53,6 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     }
     euler_total = euler_z + 360.0 * k;
     
-
-
-
-   
     uint8_t senddata[21] = {0};
     senddata[0] = 0xFF;
     senddata[1] = 0xFE;
@@ -66,6 +64,7 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     senddata[19] = 0xAA;
     senddata[20] = 0xDD;
     uart1.UART_SEND(senddata, 21);
+    ROS_INFO("Pose:");
     cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x <<endl;
 
     euler_last = euler_z;
@@ -75,9 +74,7 @@ int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "pos_node");
     ros::NodeHandle nh;
-
-    ros::Subscriber odom_pub = nh.subscribe<nav_msgs::Odometry>("aft_mapped_to_init", 1, OdomCallback);
-
+    ros::Subscriber odom_sub = nh.subscribe<nav_msgs::Odometry>("aft_mapped_to_init", 1, OdomCallback);
     ros::spin();
     return 0;
 }
