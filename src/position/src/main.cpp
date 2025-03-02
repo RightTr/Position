@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ros/ros.h>
 #include <nav_msgs/Odometry.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
@@ -17,6 +18,7 @@ using namespace com;
 using namespace std;
 
 UART uart1;
+
 
 float euler_last = 0 , euler_total = 0;
 float euler_x, euler_z;
@@ -51,10 +53,6 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     }
     euler_total = euler_z + 360.0 * k;
     
-
-
-
-   
     uint8_t senddata[21] = {0};
     senddata[0] = 0xFF;
     senddata[1] = 0xFE;
@@ -65,19 +63,52 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     memcpy(&senddata[15], &euler_x, 4);
     senddata[19] = 0xAA;
     senddata[20] = 0xDD;
-    uart1.UART_SEND(senddata, 21);
     cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x <<endl;
-
     euler_last = euler_z;
+
+    uart1.UART_SEND(senddata, 21);
+}
+
+void ClustersCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
+{
+    int clusters_amount = static_cast<int>(msg->data.size()) / 4;
+    if(clusters_amount > 5)
+    {
+        cout << "Clusters Overflow!" << endl;
+        return ;
+    }
+    if(clusters_amount == 0)
+    {
+    	return ;
+    }
+    Eigen::Vector4f clusters = Eigen::Vector4f::Zero();
+    uint8_t senddata[12 * 4 + 5] = {0};
+    for(int i = 0; i < clusters_amount; i++)
+    {
+        clusters = Eigen::Vector4f(msg->data[4 * i], msg->data[4 * i + 1], msg->data[4 * i + 2], msg->data[4 * i + 3]);
+        clusters.y() -= LIDAR2ROBOT;
+        clusters.w() /= 2.0;
+        memcpy(&senddata[12 * i + 3], &clusters.x(), 4);
+        memcpy(&senddata[12 * i + 7], &clusters.y(), 4);
+        memcpy(&senddata[12 * i + 11], &clusters.w(), 4);
+        printf("Cluster NO.%d: x:%f, y:%f, z:%f, r:%f\n", i, clusters.x(), clusters.y(), clusters.z(), clusters.w());
+    }
+    
+    senddata[0] = 0xFF;
+    senddata[1] = 0xFE;
+    senddata[2] = 2;
+    senddata[12 * 4 + 3] = 0xAA;
+    senddata[12 * 4 + 4] = 0xDD;
+
+    uart1.UART_SEND(senddata, 12 * 4 + 5);
 }
 
 int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "pos_node");
     ros::NodeHandle nh;
-
     ros::Subscriber odom_sub = nh.subscribe<nav_msgs::Odometry>("aft_mapped_to_init", 1, OdomCallback);
-
+    ros::Subscriber clusters_sub = nh.subscribe<std_msgs::Float32MultiArray>("/depth_clustering/clusters", 1, ClustersCallback);
     ros::spin();
     return 0;
 }

@@ -262,11 +262,7 @@ void UART::UART_SET_PARITY(int in_parity)
     }
 }
 
-/**
- * @brief 
- * 
- * @param buffer_written 
- */
+
 void UART::UART_SEND(const uint8_t* buffer_written, size_t length)
 {   
     ssize_t bytes_written = write(fd, buffer_written, length);
@@ -315,10 +311,6 @@ void UART::UART_RECEIVE()
     }
 }
 
-/**
- * @brief Construct a new UART::UART object
- * 
- */
 UART::UART()
 {
     UART_SET_COM_NAME("/dev/ttyUSB0");
