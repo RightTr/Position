@@ -32,6 +32,7 @@ class UART
         int stopbits = 1;        
         int baudrate = B115200;        
         bool flag = 1;
+        bool send_flag = 0;
 
         struct termios configs = {0};
 

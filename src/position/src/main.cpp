@@ -63,7 +63,6 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     senddata[19] = 0xAA;
     senddata[20] = 0xDD;
     uart1.UART_SEND(senddata, 21);
-    ROS_INFO("Pose:");
     cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x <<endl;
 
     euler_last = euler_z;
@@ -99,7 +98,7 @@ void ClustersCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
     senddata[2] = 2;
     senddata[12 * 4 + 3] = 0xAA;
     senddata[12 * 4 + 4] = 0xDD;
-    uart1.UART_SEND(senddata, 12 * 4 + 5);
+    uart1.UART_SEND_CLONE(senddata, 12 * 4 + 5);
 }
 
 int main(int argc, char *argv[])
