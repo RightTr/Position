@@ -64,6 +64,7 @@ class UART
         void UART_SET_PARITY(int in_parity);
 
         void UART_SEND(const uint8_t* buffer_written, size_t length);
+        void UART_SEND_CLONE(const uint8_t* buffer_written, size_t length);
 
         void UART_RECEIVE();
         UART();
