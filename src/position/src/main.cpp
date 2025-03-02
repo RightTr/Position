@@ -63,8 +63,8 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     senddata[19] = 0xAA;
     senddata[20] = 0xDD;
     uart1.UART_SEND(senddata, 21);
-    ROS_INFO("Pose:");
-    //cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x <<endl;
+
+    cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x <<endl;
 
     euler_last = euler_z;
 }
@@ -77,29 +77,25 @@ void ClustersCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
         cout << "Clusters Overflow!" << endl;
         return ;
     }
-    if(clusters_amount == 0)
-    {
-    	return ;
-    }
     Eigen::Vector4f clusters = Eigen::Vector4f::Zero();
-    uint8_t senddata[12 * clusters_amount + 5] = {0};
-    for(int i = 0; i < 4; i++)
+    uint8_t senddata[3 * 4 + 5] = {0};
+    for(int i = 0; i < clusters_amount; i++)
     {
         clusters = Eigen::Vector4f(msg->data[4 * i], msg->data[4 * i + 1], msg->data[4 * i + 2], msg->data[4 * i + 3]);
         clusters.y() -= LIDAR2ROBOT;
         clusters.w() /= 2.0;
-        memcpy(&senddata[12 * i + 3], &clusters.x(), 4);
-        memcpy(&senddata[12 * i + 7], &clusters.y(), 4);
-        memcpy(&senddata[12 * i + 11], &clusters.w(), 4);
+        memcpy(&senddata[3 * i + 3], &clusters.x(), 4);
+        memcpy(&senddata[3 * i + 4], &clusters.y(), 4);
+        memcpy(&senddata[3 * i + 5], &clusters.w(), 4);
         printf("Cluster NO.%d: x:%f, y:%f, z:%f, r:%f\n", i, clusters.x(), clusters.y(), clusters.z(), clusters.w());
     }
     
     senddata[0] = 0xFF;
     senddata[1] = 0xFE;
     senddata[2] = 2;
-    senddata[12 * 4 + 3] = 0xAA;
-    senddata[12 * 4 + 4] = 0xDD;
-    uart1.UART_SEND(senddata, 12 * 4 + 5);
+    senddata[3 * 4 + 3] = 0xAA;
+    senddata[3 * 4 + 4] = 0xDD;
+    uart1.UART_SEND(senddata, 3 * 4 + 5);
 }
 
 int main(int argc, char *argv[])
