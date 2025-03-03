@@ -71,7 +71,7 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 void ClustersCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
     int clusters_amount = static_cast<int>(msg->data.size()) / 4;
-    if(clusters_amount > 5)
+    if(clusters_amount > 4)
     {
         cout << "Clusters Overflow!" << endl;
         return ;
