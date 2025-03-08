@@ -8,7 +8,6 @@ std::string odometry_topic;
 std::string cluster_topic;
 bool odometry_en;
 bool cluster_en;
-std::string uart; 
 
 void ReadParameters(ros::NodeHandle &nh)
 {
@@ -20,5 +19,4 @@ void ReadParameters(ros::NodeHandle &nh)
     nh.param<std::string>("topic/cluster_topic", cluster_topic, "/depth_clustering/clusters");
     nh.param<bool>("function/odometry_en", odometry_en, true);
     nh.param<bool>("function/cluster_en", cluster_en, false);
-    nh.param<std::string>("communication/uart", uart, "/dev/ttyUSB0");
 }
