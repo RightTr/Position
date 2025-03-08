@@ -32,6 +32,7 @@ class UART
         int stopbits = 1;        
         int baudrate = B115200;        
         bool flag = 1;
+        bool send_flag = 0;
 
         struct termios configs = {0};
 
@@ -63,6 +64,7 @@ class UART
         void UART_SET_PARITY(int in_parity);
 
         void UART_SEND(const uint8_t* buffer_written, size_t length);
+        void UART_SEND_CLONE(const uint8_t* buffer_written, size_t length);
 
         void UART_RECEIVE();
         UART();

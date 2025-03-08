@@ -1,7 +1,5 @@
-build 
-devel
 .vscode
-.catkin_workspace
 .position.sh.swn
 .position.sh.swo
-src/.vscode/
+CMakeFiles
+build

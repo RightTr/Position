@@ -1,4 +1,7 @@
 #include "uart.h"
+#include "parameters.h"
+
+extern std::string uart; 
 
 namespace com{
 
@@ -265,20 +268,47 @@ void UART::UART_SET_PARITY(int in_parity)
 
 void UART::UART_SEND(const uint8_t* buffer_written, size_t length)
 {   
-    ssize_t bytes_written = write(fd, buffer_written, length);
-    usleep(1000);
+    if(!send_flag)
+    {
+        usleep(1000);
+        ssize_t bytes_written = write(fd, buffer_written, length);
+        usleep(1000);
 
-    if(bytes_written != -1)
+        if(bytes_written != -1)
+        {
+            COUT_BLUE_START
+            printf("Send %zd bytes success!\n", bytes_written);
+            COUT_COLOR_END
+        }   
+        else
+        {
+            COUT_RED_START
+            printf("Send error!\n");
+            COUT_COLOR_END
+        }
+    }
+}
+
+void UART::UART_SEND_CLONE(const uint8_t* buffer_written, size_t length)
+{   
+    if(send_flag)
     {
-        COUT_BLUE_START
-        printf("Send %zd bytes success!\n", bytes_written);
-        COUT_COLOR_END
-    }   
-    else
-    {
-        COUT_RED_START
-        printf("Send error!\n");
-        COUT_COLOR_END
+        usleep(1000);
+        ssize_t bytes_written = write(fd, buffer_written, length);
+        usleep(1000);
+
+        if(bytes_written != -1)
+        {
+            COUT_BLUE_START
+            printf("Clone Send %zd bytes success!\n", bytes_written);
+            COUT_COLOR_END
+        }   
+        else
+        {
+            COUT_RED_START
+            printf("Send error!\n");
+            COUT_COLOR_END
+        }
     }
 }
 
@@ -313,7 +343,7 @@ void UART::UART_RECEIVE()
 
 UART::UART()
 {
-    UART_SET_COM_NAME("/dev/ttyUSB0");
+    UART_SET_COM_NAME(uart);
     UART_SET_BAUDRATE(B115200);
     UART_SET_DATABITS(8);
     UART_SET_FLOW_CTRL(0);

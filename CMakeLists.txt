@@ -206,7 +206,7 @@ include_directories(
 # catkin_add_nosetests(test)
 find_package(Eigen3 REQUIRED)
 
-add_executable(position src/main.cpp src/uart.cpp)
+add_executable(position src/main.cpp src/uart.cpp src/parameters.cpp)
 target_link_libraries(position 
   ${catkin_LIBRARIES}
   Eigen3::Eigen

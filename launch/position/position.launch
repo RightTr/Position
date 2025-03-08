@@ -1,0 +1,8 @@
+<launch>
+
+    <rosparam command="load" file="$(find position)/config/config.yaml" />       
+
+    <node name="pos_node" pkg="position" type="position" output="screen" />
+
+
+</launch>
