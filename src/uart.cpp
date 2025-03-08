@@ -50,8 +50,8 @@ void UART::UART_CONFIG()
     cfsetospeed(&configs, baudrate);
 
     
-    configs.c_cflag |= (CLOCAL | CREAD); //修改控制模式，保证程序不会占用串口 | 使能从串口读取输入数据
-    configs.c_cflag &= ~CSIZE; //清除数据位大小配置
+    configs.c_cflag |= (CLOCAL | CREAD);
+    configs.c_cflag &= ~CSIZE;
 
     //设置数据位
     switch(databits)
@@ -70,51 +70,49 @@ void UART::UART_CONFIG()
             break;
     }
 
-    //设置校验位
+
     switch (this->parity) 
     {
-        case 0: //无奇偶校验位
+        case 0: 
             this->configs.c_cflag &= ~PARENB;
             this->configs.c_iflag &= ~INPCK;
             break;
-        case 1: //设置为奇校验 
+        case 1: 
             this->configs.c_cflag |= (PARODD | PARENB);
             this->configs.c_iflag |= INPCK;
             break;
-        case 2: //设置为偶校验
+        case 2: 
             this->configs.c_cflag |= PARENB;
             this->configs.c_cflag &= ~PARODD;
             this->configs.c_iflag |= INPCK;
             break;
     }
 
-    //设置停止位
     switch (this->stopbits) 
     {
-        case 1: //单停止位
+        case 1: 
             this->configs.c_cflag &= ~CSTOPB;
             break;
-        case 2: //双停止位
+        case 2: 
             this->configs.c_cflag |= CSTOPB;
             break;
     }
-
-    //设置数据流    
+   
     switch(flow_ctrl)
     {
-        case 0: //不使用数据流控制
+        case 0: 
             configs.c_cflag &= ~CRTSCTS; 
             break;
-        case 1: //使用硬件流控制
+        case 1: 
             configs.c_cflag |= CRTSCTS; 
             break;
     }
 
 
-    configs.c_cc[VTIME] = 1; //读取一个字符等待1*0.1s 
-    configs.c_cc[VMIN] = 1; //读取字符的最少个数为1
+    configs.c_cc[VTIME] = 1; 
+    configs.c_cc[VMIN] = 1; 
 
-    tcflush(this->fd,TCIFLUSH); //如果发生数据溢出，接收数据，但是不再读取 刷新收到的数据但是不读
+    tcflush(this->fd,TCIFLUSH); 
 
     if(tcsetattr(fd, TCSANOW, &configs))
     {
@@ -268,9 +266,9 @@ void UART::UART_SEND(const uint8_t* buffer_written, size_t length)
 {   
     if(!send_flag)
     {
-        usleep(1000);
+        usleep(5000);
         ssize_t bytes_written = write(fd, buffer_written, length);
-        usleep(1000);
+        usleep(5000);
 
         if(bytes_written != -1)
         {
@@ -291,9 +289,9 @@ void UART::UART_SEND_CLONE(const uint8_t* buffer_written, size_t length)
 {   
     if(send_flag)
     {
-        usleep(1000);
+        usleep(5000);
         ssize_t bytes_written = write(fd, buffer_written, length);
-        usleep(1000);
+        usleep(5000);
 
         if(bytes_written != -1)
         {

@@ -71,7 +71,7 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     }
     euler_total = euler_z + 360.0 * k;
     
-    uint8_t senddata[34] = {0};
+    uint8_t senddata[33] = {0};
     senddata[0] = 0xFF;
     senddata[1] = 0xFE;
     senddata[2] = 1;
@@ -82,9 +82,9 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     memcpy(&senddata[19], &x_lidar2robot_vel, 4);
     memcpy(&senddata[23], &y_lidar2robot_vel, 4);
     memcpy(&senddata[27], &z_angular_vel, 4);
-    senddata[32] = 0xAA;
-    senddata[33] = 0xDD;
-    uart1.UART_SEND(senddata, 34);
+    senddata[31] = 0xAA;
+    senddata[32] = 0xDD;
+    uart1.UART_SEND(senddata, 33);
     cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x << endl;
     cout << "vel_x:" << x_lidar2robot_vel << ",vel_y:" << y_lidar2robot_vel << ",angvel_z:" << z_angular_vel << endl;
 

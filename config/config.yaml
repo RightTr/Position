@@ -1,7 +1,7 @@
 robot:
   lidar2robot_x: 0
-  lidar2rocot_y: 0.24215
-  lidar2rocot_dis: 0.24215
+  lidar2robot_y: 0.24215
+  lidar2robot_dis: 0.24215
   lidar2robot_ang: 90.0
 
 topic:

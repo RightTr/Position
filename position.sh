@@ -18,7 +18,7 @@ gnome-terminal -- bash -c "roslaunch depth_clustering Mid360.launch; exec bash"
 sleep 2
 
 source /home/nf/Position_dc_jetson/devel/setup.bash
-gnome-terminal -- bash -c "rosrun position position; exec bash" 
+gnome-terminal -- bash -c "roslaunch position position.launch; exec bash" 
 sleep 2
 
 echo "ROS launch file started successfully!"
