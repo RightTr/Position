@@ -1,0 +1,16 @@
+robot:
+  lidar2robot_x: 0
+  lidar2rocot_y: 0.24215
+  lidar2rocot_dis: 0.24215
+  lidar2robot_ang: 90
+
+topic:
+  odometry_topic: "/aft_mapped_to_init"
+  cluster_topic: "/depth_clustering/clusters"
+
+function:
+  odometry_en: true
+  cluster_en: false
+
+communication:
+  uart:
