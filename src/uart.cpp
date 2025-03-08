@@ -1,7 +1,5 @@
 #include "uart.h"
-#include "parameters.h"
 
-extern std::string uart; 
 
 namespace com{
 
@@ -343,7 +341,7 @@ void UART::UART_RECEIVE()
 
 UART::UART()
 {
-    UART_SET_COM_NAME(uart);
+    UART_SET_COM_NAME("/dev/ttyUSB0");
     UART_SET_BAUDRATE(B115200);
     UART_SET_DATABITS(8);
     UART_SET_FLOW_CTRL(0);
