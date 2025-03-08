@@ -11,6 +11,3 @@ topic:
 function:
   odometry_en: true
   cluster_en: false
-
-communication:
-  uart:

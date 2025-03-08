@@ -48,13 +48,13 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 
     x_imu2lidar = float(msg->pose.pose.position.x) + MID360_IMU2LIDAR_X - MID360_IMU2LIDAR_DIS * cosf(MID360_IMU2LIDAR_ANG + euler_z);
     y_imu2lidar = float(msg->pose.pose.position.y) + MID360_IMU2LIDAR_Y - MID360_IMU2LIDAR_DIS * sinf(MID360_IMU2LIDAR_ANG + euler_z); 
-    x_imu2lidar_vel = float(msg->twist.twist.linear.x) + MID360_IMU2LIDAR_X - MID360_IMU2LIDAR_DIS * cosf(MID360_IMU2LIDAR_ANG + euler_z);
-    y_imu2lidar_vel = float(msg->twist.twist.linear.y) + MID360_IMU2LIDAR_Y - MID360_IMU2LIDAR_DIS * sinf(MID360_IMU2LIDAR_ANG + euler_z);
+    x_imu2lidar_vel = float(msg->twist.twist.linear.x);
+    y_imu2lidar_vel = float(msg->twist.twist.linear.y);
 
     x_lidar2robot = x_imu2lidar + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
     y_lidar2robot = y_imu2lidar + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
-    x_lidar2robot_vel = x_imu2lidar_vel + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
-    y_lidar2robot_vel = y_imu2lidar_vel + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+    x_lidar2robot_vel = x_imu2lidar_vel * cosf(euler_z) - y_imu2lidar_vel * sinf(euler_z);
+    y_lidar2robot_vel = y_imu2lidar_vel * cosf(euler_z) + x_imu2lidar_vel * sinf(euler_z);
     
     z_angular_vel = float(msg->twist.twist.angular.z) * (180.0 / M_PI);
 
