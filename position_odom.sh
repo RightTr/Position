@@ -10,10 +10,6 @@ sleep 4
 gnome-terminal -- bash -c "roslaunch point_lio mapping_horizon.launch; exec bash" 
 sleep 2
 
-source /home/right/depth_clustering_ws/devel/setup.bash
-gnome-terminal -- bash -c "roslaunch depth_clustering Mid360.launch; exec bash" 
-sleep 2
-
 source /home/right/Position/devel/setup.bash
 gnome-terminal -- bash -c "roslaunch position position.launch; exec bash" 
 sleep 2
