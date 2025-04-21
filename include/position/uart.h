@@ -9,7 +9,6 @@
 #include <errno.h>
 #include <fcntl.h>
 
-
 #define COUT_RED_START      std::cout << "\033[1;31m";
 #define COUT_GREEN_START    std::cout << "\033[1;32m";
 #define COUT_YELLOW_START   std::cout << "\033[1;33m";

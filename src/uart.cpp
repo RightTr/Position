@@ -266,10 +266,12 @@ void UART::UART_SEND(const uint8_t* buffer_written, size_t length)
 {   
     if(!send_flag)
     {
+        send_flag = 1;
         usleep(5000);
         ssize_t bytes_written = write(fd, buffer_written, length);
         usleep(5000);
-
+        send_flag = 0;
+        
         if(bytes_written != -1)
         {
             COUT_BLUE_START
@@ -287,11 +289,13 @@ void UART::UART_SEND(const uint8_t* buffer_written, size_t length)
 
 void UART::UART_SEND_CLONE(const uint8_t* buffer_written, size_t length)
 {   
-    if(send_flag)
+    if(!send_flag)
     {
+        send_flag = 1;
         usleep(5000);
         ssize_t bytes_written = write(fd, buffer_written, length);
         usleep(5000);
+        send_flag = 0;
 
         if(bytes_written != -1)
         {
