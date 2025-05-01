@@ -11,3 +11,6 @@ topic:
 function:
   odometry_en: true
   cluster_en: false
+
+data_process:
+  delta_dis_threshold: 2.0

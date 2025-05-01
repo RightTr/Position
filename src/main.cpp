@@ -28,8 +28,9 @@ extern std::string odometry_topic;
 extern std::string cluster_topic;
 extern bool odometry_en;
 extern bool cluster_en;
+extern float delta_dis_threshold;
 
-float euler_last = 0 , euler_total = 0;
+float euler_last = 0.0 , euler_total = 0.0;
 float euler_x, euler_z;
 int k = 0;
 float x_imu2lidar, y_imu2lidar;
@@ -37,6 +38,9 @@ float x_lidar2robot, y_lidar2robot;
 float x_imu2lidar_vel, y_imu2lidar_vel;
 float x_lidar2robot_vel, y_lidar2robot_vel;
 float z_angular_vel;
+
+bool is_first = true;
+float last_x = 0.0, last_y = 0.0;
 
 void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {   
@@ -53,6 +57,23 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 
     x_lidar2robot = x_imu2lidar + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
     y_lidar2robot = y_imu2lidar + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+
+    if (!is_first)
+    {
+        float dx = x_lidar2robot - last_x;
+        float dy = y_lidar2robot - last_y;
+        float ddist = sqrt(dx*dx + dy*dy);
+
+        if (ddist > delta_dis_threshold)
+        {
+            std::cerr << "Odometry jump detected. dx: " << dx << ", dy: " << dy << std::endl;
+            return;
+        }
+    }
+    is_first = false;
+    last_x = x_lidar2robot;
+    last_y = y_lidar2robot;
+
     x_lidar2robot_vel = x_imu2lidar_vel * cosf(euler_z) - y_imu2lidar_vel * sinf(euler_z);
     y_lidar2robot_vel = y_imu2lidar_vel * cosf(euler_z) + x_imu2lidar_vel * sinf(euler_z);
     
