@@ -24,6 +24,7 @@ extern float lidar2robot_x;
 extern float lidar2robot_y;
 extern float lidar2robot_dis;
 extern float lidar2robot_ang;
+extern float lidar2robot_ang_x;
 extern std::string odometry_topic;
 extern std::string cluster_topic;
 extern bool odometry_en;
@@ -32,7 +33,7 @@ extern bool cluster_en;
 float euler_last = 0 , euler_total = 0;
 float euler_x, euler_z;
 int k = 0;
-float x_imu2lidar, y_imu2lidar;
+float x_imu2lidar, y_imu2lidar, imu2lidar, ang_imu2lidar;
 float x_lidar2robot, y_lidar2robot;
 float x_imu2lidar_vel, y_imu2lidar_vel;
 float x_lidar2robot_vel, y_lidar2robot_vel;
@@ -51,8 +52,13 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     x_imu2lidar_vel = float(msg->twist.twist.linear.x);
     y_imu2lidar_vel = float(msg->twist.twist.linear.y);
 
-    x_lidar2robot = x_imu2lidar + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
-    y_lidar2robot = y_imu2lidar + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+    imu2lidar = sqrt(x_imu2lidar * x_imu2lidar + y_imu2lidar * y_imu2lidar);
+    ang_imu2lidar = atan2f(y_imu2lidar, x_imu2lidar);
+    lidar2robot_ang *= (M_PI / 180.0);
+    lidar2robot_ang_x *= (M_PI / 180.0);
+
+    x_lidar2robot = imu2lidar * cosf(ang_imu2lidar + lidar2robot_ang_x) + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang + euler_z);
+    y_lidar2robot = imu2lidar * sinf(ang_imu2lidar + lidar2robot_ang_x) + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang + euler_z);
     x_lidar2robot_vel = x_imu2lidar_vel * cosf(euler_z) - y_imu2lidar_vel * sinf(euler_z);
     y_lidar2robot_vel = y_imu2lidar_vel * cosf(euler_z) + x_imu2lidar_vel * sinf(euler_z);
     
@@ -71,7 +77,7 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     }
     euler_total = euler_z + 360.0 * k;
     
-    uint8_t senddata[34] = {0};
+    uint8_t senddata[33] = {0};
     senddata[0] = 0xFF;
     senddata[1] = 0xFE;
     senddata[2] = 1;
@@ -82,9 +88,9 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     memcpy(&senddata[19], &x_lidar2robot_vel, 4);
     memcpy(&senddata[23], &y_lidar2robot_vel, 4);
     memcpy(&senddata[27], &z_angular_vel, 4);
-    senddata[32] = 0xAA;
-    senddata[33] = 0xDD;
-    uart1.UART_SEND(senddata, 34);
+    senddata[31] = 0xAA;
+    senddata[32] = 0xDD;
+    uart1.UART_SEND(senddata, 33);
     cout << "x:" << x_lidar2robot << ",y:" << y_lidar2robot << ",yaw:" << euler_z <<",yaw_total:" << euler_total << ",pitch:" << euler_x << endl;
     cout << "vel_x:" << x_lidar2robot_vel << ",vel_y:" << y_lidar2robot_vel << ",angvel_z:" << z_angular_vel << endl;
 
