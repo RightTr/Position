@@ -3,6 +3,7 @@ robot:
   lidar2robot_y: 0.24215
   lidar2robot_dis: 0.24215
   lidar2robot_ang: 90.0
+  lidar2robot_ang_x: 180.0
 
 topic:
   odometry_topic: "/aft_mapped_to_init"

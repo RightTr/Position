@@ -4,6 +4,7 @@ float lidar2robot_x;
 float lidar2robot_y;
 float lidar2robot_dis;
 float lidar2robot_ang;
+float lidar2robot_ang_x;
 std::string odometry_topic;
 std::string cluster_topic;
 bool odometry_en;
