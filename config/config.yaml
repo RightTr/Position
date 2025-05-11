@@ -3,7 +3,9 @@ robot:
   lidar2robot_y: 0.0
   lidar2robot_dis: 0.345
   lidar2robot_ang: 0.0
-  lidar2robot_ang_x: 180.0
+  # 0: 两组xy平行同向
+  # 180 or -180: 两组xy平行反向
+  lidar2robot_ang_xx: 180
 
 topic:
   odometry_topic: "/aft_mapped_to_init"

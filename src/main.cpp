@@ -24,7 +24,7 @@ extern float lidar2robot_x;
 extern float lidar2robot_y;
 extern float lidar2robot_dis;
 extern float lidar2robot_ang;
-extern float lidar2robot_ang_x;
+extern float lidar2robot_ang_xx;
 extern std::string odometry_topic;
 extern std::string cluster_topic;
 extern bool odometry_en;
@@ -34,7 +34,7 @@ extern float delta_dis_threshold;
 float euler_last = 0.0 , euler_total = 0.0;
 float euler_x, euler_z;
 int k = 0;
-float x_imu2lidar, y_imu2lidar, imu2lidar, ang_imu2lidar;
+float x_imu2lidar, y_imu2lidar;
 float x_lidar2robot, y_lidar2robot;
 float x_imu2lidar_vel, y_imu2lidar_vel;
 float x_lidar2robot_vel, y_lidar2robot_vel;
@@ -56,13 +56,22 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     x_imu2lidar_vel = float(msg->twist.twist.linear.x);
     y_imu2lidar_vel = float(msg->twist.twist.linear.y);
 
-    imu2lidar = sqrt(x_imu2lidar * x_imu2lidar + y_imu2lidar * y_imu2lidar);
-    ang_imu2lidar = atan2f(y_imu2lidar, x_imu2lidar);
-
-    x_lidar2robot = imu2lidar * cosf(ang_imu2lidar * (M_PI / 180.0) + lidar2robot_ang_x) + 
-                    lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
-    y_lidar2robot = imu2lidar * sinf(ang_imu2lidar * (M_PI / 180.0) + lidar2robot_ang_x) + 
-                    lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+    if(lidar2robot_ang_xx == 0)
+    {
+        x_lidar2robot = x_imu2lidar + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+        y_lidar2robot = y_imu2lidar + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+    }
+    else if(lidar2robot_ang_xx == 180 || lidar2robot_ang_xx == -180)
+    {
+        x_lidar2robot = -x_imu2lidar + lidar2robot_x - lidar2robot_dis * cosf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+        y_lidar2robot = -y_imu2lidar + lidar2robot_y - lidar2robot_dis * sinf(lidar2robot_ang * (M_PI / 180.0) + euler_z);
+    }
+    else
+    {
+        x_lidar2robot = 0;
+        y_lidar2robot = 0;
+        cout << "Invalid Angle!" << endl;
+    }
     x_lidar2robot_vel = x_imu2lidar_vel * cosf(euler_z) - y_imu2lidar_vel * sinf(euler_z);
     y_lidar2robot_vel = y_imu2lidar_vel * cosf(euler_z) + x_imu2lidar_vel * sinf(euler_z);
 
