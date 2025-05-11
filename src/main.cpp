@@ -33,7 +33,7 @@ extern bool cluster_en;
 float euler_last = 0 , euler_total = 0;
 float euler_x, euler_z;
 int k = 0;
-float x_imu2lidar, y_imu2lidar, imu2lidar, ang_imu2lidar;
+float x_imu2lidar, y_imu2lidar;
 float x_lidar2robot, y_lidar2robot;
 float x_imu2lidar_vel, y_imu2lidar_vel;
 float x_lidar2robot_vel, y_lidar2robot_vel;
