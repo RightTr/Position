@@ -10,6 +10,7 @@ project(position)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions

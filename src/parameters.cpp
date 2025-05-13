@@ -9,7 +9,8 @@ std::string odometry_topic;
 std::string cluster_topic;
 bool odometry_en;
 bool cluster_en;
-float delta_dis_threshold;
+float delta_dis_max;
+float delta_dis_min;
 
 void ReadParameters(ros::NodeHandle &nh)
 {
@@ -22,5 +23,6 @@ void ReadParameters(ros::NodeHandle &nh)
     nh.param<std::string>("topic/cluster_topic", cluster_topic, "/depth_clustering/clusters");
     nh.param<bool>("function/odometry_en", odometry_en, true);
     nh.param<bool>("function/cluster_en", cluster_en, false);
-    nh.param<float>("data_process/delta_dis_threshold", delta_dis_threshold, 2.0);
+    nh.param<float>("data_process/delta_dis_max", delta_dis_max, 2.0);
+    nh.param<float>("data_process/delta_dis_min", delta_dis_min, 0.05);
 }

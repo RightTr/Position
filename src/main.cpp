@@ -1,10 +1,12 @@
 #include "uart.h"
 #include <iostream>
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <fstream>  
 #include "parameters.h"
 
 #define MID360_IMU2LIDAR_X 0.011
@@ -29,7 +31,8 @@ extern std::string odometry_topic;
 extern std::string cluster_topic;
 extern bool odometry_en;
 extern bool cluster_en;
-extern float delta_dis_threshold;
+extern float delta_dis_max;
+extern float delta_dis_min;
 
 float euler_last = 0.0 , euler_total = 0.0;
 float euler_x, euler_z;
@@ -42,6 +45,10 @@ float z_angular_vel;
 
 bool is_first = true;
 float last_x = 0.0, last_y = 0.0;
+
+ofstream file;
+string package_path = ros::package::getPath("position");
+string path = package_path + "/log/Odometry.txt";
 
 void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {   
@@ -80,10 +87,17 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
         float dx = x_lidar2robot - last_x;
         float dy = y_lidar2robot - last_y;
         float ddist = sqrt(dx*dx + dy*dy);
-
-        if (ddist > delta_dis_threshold)
+        if (!file.is_open()) 
+        {
+            ROS_ERROR("Open Odometry.txt in OdomCallback Failed!");
+            ros::shutdown();
+            return;
+        }
+        if (ddist > delta_dis_max || ddist < delta_dis_min)
         {
             std::cerr << "Odometry jump detected. dx: " << dx << ", dy: " << dy << std::endl;
+            file << "x_lidar2robot_last: " << last_x << ",y_lidar2robot_last: " << last_y
+                 << ",x_lidar2robot: " << x_lidar2robot << ",y_lidar2robot: " << y_lidar2robot << endl;
             return;
         }
     }
@@ -134,7 +148,7 @@ void ClustersCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
     int clusters_amount = static_cast<int>(msg->data.size()) / 4;
     if(clusters_amount > 4)
     {
-        cout << "Clusters Overflow!" << endl;
+        ROS_ERROR("Clusters Overflow!");
         return ;
     }
     if(clusters_amount == 0)
@@ -167,6 +181,18 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "position");
     ros::NodeHandle nh;
     ReadParameters(nh);
+    file.open(path);
+    if (!path.empty()) 
+    {
+        remove(path.c_str());
+    }
+    if(!file.is_open())
+    {
+        ROS_ERROR("Open odometry.txt failed!");
+        ros::shutdown();
+        return -1;
+    }
+    file << "Odometry jump detection started" << endl;
     if(odometry_en)
     {
         odometry_sub = nh.subscribe<nav_msgs::Odometry>(odometry_topic, 1, OdomCallback);        
@@ -176,5 +202,7 @@ int main(int argc, char *argv[])
         cluster_sub = nh.subscribe<std_msgs::Float32MultiArray>(cluster_topic, 1, ClustersCallback);
     }
     ros::spin();
+
+    file.close();
     return 0;
 }
