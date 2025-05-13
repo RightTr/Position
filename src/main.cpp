@@ -31,8 +31,8 @@ extern std::string odometry_topic;
 extern std::string cluster_topic;
 extern bool odometry_en;
 extern bool cluster_en;
-extern float delta_dis_max;
-extern float delta_dis_min;
+extern float delta_dis_threshold;
+extern float delta_angle_threshold;
 
 float euler_last = 0.0 , euler_total = 0.0;
 float euler_x, euler_z;
@@ -44,7 +44,7 @@ float x_lidar2robot_vel, y_lidar2robot_vel;
 float z_angular_vel;
 
 bool is_first = true;
-float last_x = 0.0, last_y = 0.0;
+float last_x = 0.0, last_y = 0.0, last_angle = 0.0;
 
 ofstream file;
 string package_path = ros::package::getPath("position");
@@ -86,6 +86,7 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     {
         float dx = x_lidar2robot - last_x;
         float dy = y_lidar2robot - last_y;
+        float dangle = euler_z - last_angle;
         float ddist = sqrt(dx*dx + dy*dy);
         if (!file.is_open()) 
         {
@@ -93,11 +94,17 @@ void OdomCallback(const nav_msgs::Odometry::ConstPtr& msg)
             ros::shutdown();
             return;
         }
-        if (ddist > delta_dis_max || ddist < delta_dis_min)
+        if (ddist > delta_dis_threshold)
         {
-            std::cerr << "Odometry jump detected. dx: " << dx << ", dy: " << dy << std::endl;
+            cerr << "Odometry jump detected. dx: " << dx << ", dy: " << dy << endl;
             file << "x_lidar2robot_last: " << last_x << ",y_lidar2robot_last: " << last_y
                  << ",x_lidar2robot: " << x_lidar2robot << ",y_lidar2robot: " << y_lidar2robot << endl;
+            return;
+        }
+        if(dangle > delta_angle_threshold || -dangle > delta_angle_threshold)
+        {
+            cerr << "Odometry jump detected. dangle: " << dangle << endl;
+            file << "euler_z_last: " << last_angle << ",euler_z: " << euler_z << endl;
             return;
         }
     }
@@ -181,11 +188,11 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "position");
     ros::NodeHandle nh;
     ReadParameters(nh);
-    file.open(path);
     if (!path.empty()) 
     {
         remove(path.c_str());
     }
+    file.open(path);
     if(!file.is_open())
     {
         ROS_ERROR("Open odometry.txt failed!");

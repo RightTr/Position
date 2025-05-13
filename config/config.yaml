@@ -16,5 +16,5 @@ function:
   cluster_en: false
 
 data_process:
-  delta_dis_max: 2.0
-  delta_dis_min: 2.0
+  delta_dis_threshold: 0.5
+  delta_angle_threshold: 2

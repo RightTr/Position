@@ -11,7 +11,7 @@ extern std::string odometry_topic;
 extern std::string cluster_topic;
 extern bool odometry_en;
 extern bool cluster_en;
-extern float delta_dis_max;
-extern float delta_dis_min;
+extern float delta_dis_threshold;
+extern float delta_angle_threshold;
 
 void ReadParameters(ros::NodeHandle &nh);
